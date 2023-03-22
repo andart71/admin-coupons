@@ -1,4 +1,4 @@
-import { Button, Grid, TextField } from '@mui/material';
+import { Button, Grid, TextField, Alert } from '@mui/material';
 import React, { useState } from 'react';
 import { Paper } from '@mui/material';
 import axios from 'axios';
@@ -15,7 +15,9 @@ const App = () => {
     const [newPrice, setNewPrice] = useState('');
     const [coupon, setCoupon] = useState('');
     const [cat, setCat] = useState('');
-    const [message, setMessage] = useState('');
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
+    const [username, setUsername] = useState('');
 
     const handleChangeName = (event: any) => {
       setName(event.target.value);
@@ -57,17 +59,34 @@ const App = () => {
       setCat(event.target.value);
   }
 
-  
-  const handleClick = async () => {
-    await axios.post(`https://cupons-server.vercel.app/addCouponss`, { name: name, desct: desct, image: image, start_date: startDate, finish_date: finishDate, rest: rest, old_price: oldPrice, new_price: newPrice, coupon: coupon, id_category: cat})
-    console.log('CLICK')
-      if (name && image && desct && startDate && finishDate && startDate && rest && oldPrice && newPrice && cat) {
-          
+  const handleChangeUsername = (event: any) => {
+    setUsername(event.target.value);
+  }
+
+  const handleClick = async() => {
+    setError('');
+    setSuccess('')
+      if (name && desct && image && finishDate && rest && cat) {
+        const fullItems = await axios.get('http://localhost:3001/getItems?id=0');
+        fullItems.data.sort((a: any, b: any) => a.id > b.id ? 1 : -1);
+        console.log(fullItems.data, '[NEW ARRAY]');
+        const lastId = fullItems.data.length;
+        const { data } = await axios.post(`http://localhost:3001/addCoupon`, { id: lastId, name: name, desct: desct, image: image, start_date: startDate, finish_date: finishDate, rest: rest, old_price: oldPrice, new_price: newPrice, coupon: coupon, id_category: cat, username: username});
+        console.log(data, '[data]')
+        if (data.status === 'success') {
+            setSuccess('Купон успешно добавлен!')
+        } else {
+            setError('Произошла ошибка при добавлении купона!')
+        }
+      } else {
+        setError('Обязательные поля не заполнены')
       }
   }
 
   return (
     <Paper style={{ padding: '20px' }} elevation={3}>
+        {error && <><Alert severity="error">{error}</Alert><br /></>}
+        {success && <><Alert severity="success">{success}</Alert><br /></>}
       <Grid item xs={8} sm={8} md={8} xl={12} key={1}>
         <TextField label="Название *" onChange={handleChangeName} name="name" /><br /><br />
         <TextField label="Ссылка на картинку *" onChange={handleChangeImage} name="image" /><br /><br />
@@ -79,6 +98,7 @@ const App = () => {
         <TextField label="Новая цена *" onChange={handleChangeNewPrice} name="new_price" /><br /><br />
         <TextField label="Купон (при наличии)" onChange={handleChangeCoupon} name="coupon" /><br /><br />
         <TextField label="ID категории *" onChange={handleChangeCat} name="category" /><br /><br />
+        <TextField label="Имя пользователя" onChange={handleChangeUsername} name="username" /><br /><br />
         <Button onClick={handleClick} variant="contained">Отправить</Button>
         </Grid>
     </ Paper>
