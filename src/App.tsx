@@ -57,6 +57,7 @@ const App = () => {
       setCat(event.target.value);
   }
 
+  
   const handleClick = async () => {
     await axios.post(`https://cupons-server.vercel.app/addCouponss`, { name: name, desct: desct, image: image, start_date: startDate, finish_date: finishDate, rest: rest, old_price: oldPrice, new_price: newPrice, coupon: coupon, id_category: cat})
     console.log('CLICK')
