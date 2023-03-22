@@ -67,11 +67,11 @@ const App = () => {
     setError('');
     setSuccess('')
       if (name && desct && image && finishDate && rest && cat) {
-        const fullItems = await axios.get('http://localhost:3001/getItems?id=0');
+        const fullItems = await axios.get('https://cupons-server.vercel.app/getItems?id=0');
         fullItems.data.sort((a: any, b: any) => a.id > b.id ? 1 : -1);
         console.log(fullItems.data, '[NEW ARRAY]');
         const lastId = fullItems.data.length;
-        const { data } = await axios.post(`http://localhost:3001/addCoupon`, { id: lastId, name: name, desct: desct, image: image, start_date: startDate, finish_date: finishDate, rest: rest, old_price: oldPrice, new_price: newPrice, coupon: coupon, id_category: cat, username: username});
+        const { data } = await axios.post(`https://cupons-server.vercel.app/addCoupon`, { id: lastId, name: name, desct: desct, image: image, start_date: startDate, finish_date: finishDate, rest: rest, old_price: oldPrice, new_price: newPrice, coupon: coupon, id_category: cat, username: username});
         console.log(data, '[data]')
         if (data.status === 'success') {
             setSuccess('Купон успешно добавлен!')
